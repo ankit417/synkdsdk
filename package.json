@@ -1,6 +1,6 @@
 {
   "name": "react-native-synkd-sdk",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "synkd sdk",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -63,8 +63,8 @@
     "prettier": "^2.0.5",
     "react": "16.13.1",
     "react-native": "0.63.4",
-    "react-native-builder-bob": "^0.18.0",
-    "release-it": "^14.2.2",
+    "react-native-builder-bob": "^0.18.2",
+    "release-it": "^14.12.4",
     "typescript": "^4.1.3"
   },
   "peerDependencies": {
@@ -83,23 +83,7 @@
       "@commitlint/config-conventional"
     ]
   },
-  "release-it": {
-    "git": {
-      "commitMessage": "chore: release ${version}",
-      "tagName": "v${version}"
-    },
-    "npm": {
-      "publish": true
-    },
-    "github": {
-      "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "preset": "angular"
-      }
-    }
-  },
+  "release-it": {},
   "eslintConfig": {
     "root": true,
     "extends": [
