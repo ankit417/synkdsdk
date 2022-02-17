@@ -4,7 +4,6 @@ import { WebView } from "react-native-webview";
 
 interface SynkdSdkProps {
   key: number;
-  src: string;
   tag: string;
   mraid?: boolean;
   height?: number;
@@ -13,7 +12,6 @@ interface SynkdSdkProps {
 }
 
 export const SynkdSdk = ({
-  src,
   key,
   tag,
   mraid = false,
@@ -23,11 +21,12 @@ export const SynkdSdk = ({
 }: SynkdSdkProps) => {
   const URL =
     "https://insprep.s3.eu-west-1.amazonaws.com/SDK/apptags/adsdk2.html?";
+  const SRC = "https://media-cdn.synkd.life/fenix.js"
   return (
     <View style={[{ height: height, width: width }, styles]}>
       <WebView
         source={{
-          uri: `${URL}src=${src}&tag=${tag}&key=${key}&mraid=${mraid}`,
+          uri: `${URL}src=${SRC}&tag=${tag}&key=${key}&mraid=${mraid}`,
         }}
       />
     </View>
