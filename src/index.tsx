@@ -3,8 +3,8 @@ import { View ,ViewStyle } from "react-native";
 import { WebView } from "react-native-webview";
 
 interface SynkdSdkProps {
-  key: number;
-  tag: string;
+  key: string;
+  tag: number;
   mraid?: boolean;
   height?: number;
   width?: number;

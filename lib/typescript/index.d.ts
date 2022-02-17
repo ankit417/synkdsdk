@@ -1,8 +1,8 @@
 /// <reference types="react" />
 import { ViewStyle } from "react-native";
 interface SynkdSdkProps {
-    key: number;
-    tag: string;
+    key: string;
+    tag: number;
     mraid?: boolean;
     height?: number;
     width?: number;
