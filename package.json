@@ -36,13 +36,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/ankit417/react-native-synkd-sdk",
+  "repository": "https://github.com/ankit417/synkdsdk",
   "author": "synkd <acharya.ankit417@gmail.com> (https://github.com/ankit417)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ankit417/react-native-synkd-sdk/issues"
+    "url": "https://github.com/ankit417/synkdsdk/issues"
   },
-  "homepage": "https://github.com/ankit417/react-native-synkd-sdk#readme",
+  "homepage": "https://github.com/ankit417/synkdsdk#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
