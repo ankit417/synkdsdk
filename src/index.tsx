@@ -25,6 +25,7 @@ export const SynkdSdk = ({
   return (
     <View style={[{ height: height, width: width }, styles]}>
       <WebView
+      originWhitelist={['*']}
         source={{
           uri: `${URL}src=${SRC}&tag=${tag}&key=${key}&mraid=${mraid}`,
         }}
