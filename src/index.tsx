@@ -3,7 +3,7 @@ import { View, ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 interface SynkdSdkProps {
-  key: string;
+  sKey: string;
   tag: number;
   mraid?: boolean;
   height?: number;
@@ -12,7 +12,7 @@ interface SynkdSdkProps {
 }
 
 export const SynkdSdk = ({
-  key,
+  sKey,
   tag,
   mraid = false,
   height = 400,
@@ -27,7 +27,7 @@ export const SynkdSdk = ({
       <WebView
         originWhitelist={['*']}
         source={{
-          uri: `${URL}src=${SRC}&tag=${tag}&key=${key}&mraid=${mraid}`,
+          uri: `${URL}src=${SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
         }}
         javaScriptEnabled={true}
         domStorageEnabled={true}
