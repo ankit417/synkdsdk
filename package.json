@@ -129,6 +129,6 @@
     ]
   },
   "dependencies": {
-    "react-native-webview": "^10.10.2"
+    "react-native-webview": "^11.13.0"
   }
 }
