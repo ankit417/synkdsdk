@@ -246,8 +246,8 @@ const Sticky = (
   sKey,
   tag,
   mraid = false,
-  height = 400,
-  width = 400,
+  height = 50,
+  width = 300,
   // styles: ViewStyle,
   type,
   URL,
@@ -255,7 +255,7 @@ const Sticky = (
 ) => {
   return URL ? (
     <View style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
-      <TouchableOpacity style={{flex: 1}} onPress={() => Linking.openURL(CTA)}>
+      <TouchableOpacity style={{flex: 1,height,width}} onPress={() => Linking.openURL(CTA)}>
         <WebView
           style={SDKstyles.adView}
           originWhitelist={['*']}
