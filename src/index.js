@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ViewStyle,
@@ -10,7 +10,7 @@ import {
   Linking,
   Image,
 } from 'react-native';
-import {WebView} from 'react-native-webview';
+import { WebView } from 'react-native-webview';
 
 const DeviceWidth = Dimensions.get('window').width;
 const DeviceHeight = Dimensions.get('window').height;
@@ -19,7 +19,7 @@ const MAIN_URL =
   'https://insprep.s3.eu-west-1.amazonaws.com/SDK/apptags/adsdk2.html?';
 const MAIN_SRC = 'https://media-cdn.synkd.life/fenix.js';
 
-export const SynkdSdkNew = ({
+export const SynkdSdk = ({
   sKey,
   tag,
   mraid = false,
@@ -74,7 +74,7 @@ export const SynkdSdkNew = ({
     // styles,
     type,
     adURL,
-    CTA,
+    CTA
   );
 };
 
@@ -87,7 +87,7 @@ const getAdType = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA,
+  CTA
 ) => {
   switch (type) {
     case 'superoptic':
@@ -100,7 +100,7 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA,
+        CTA
       );
 
     case 'sticky':
@@ -113,7 +113,7 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA,
+        CTA
       );
     case 'interstitial':
       return interStitial(
@@ -125,7 +125,7 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA,
+        CTA
       );
     default:
       return superoptic(
@@ -137,7 +137,7 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA,
+        CTA
       );
   }
 };
@@ -151,7 +151,7 @@ const interStitial = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA,
+  CTA
 ) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [interstitialHeight, setInterstitialHeight] = useState(DeviceHeight);
@@ -171,10 +171,11 @@ const interStitial = (
         bottom: 0,
         left: 0,
         right: 0,
-        zIndex: 1000,
+        // zIndex: 1000,
         height: interstitialHeight,
         width: DeviceWidth,
-      }}>
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           setInterstitialHeight(0);
@@ -183,9 +184,9 @@ const interStitial = (
           position: 'absolute',
           top: 0,
           padding: 20,
-          zIndex: 1001,
+          // zIndex: 1001,
           right: DeviceWidth / 2,
-          transform: [{translateX: 50}],
+          transform: [{ translateX: 50 }],
           opacity: interstitialHeight > 0 ? 1 : 0,
           shadowColor: '#000',
           shadowOffset: {
@@ -196,14 +197,16 @@ const interStitial = (
           shadowRadius: 3.84,
 
           elevation: 5,
-        }}>
+        }}
+      >
         <Text
           style={{
             fontSize: 20,
             borderRadius: 150,
             borderWidth: 1,
             padding: 10,
-          }}>
+          }}
+        >
           X
         </Text>
       </TouchableOpacity>
@@ -226,7 +229,7 @@ const interStitial = (
       />
     </View>
   ) : (
-    <View style={{height: 10}} />
+    <View style={{ height: 10 }} />
   );
 };
 
@@ -239,7 +242,7 @@ const SuperOptic = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA,
+  CTA
 ) => {
   const [superOpticHeight, setSuperOpticHeight] = useState(DeviceHeight);
 
@@ -250,7 +253,8 @@ const SuperOptic = (
           height: superOpticHeight,
           width: DeviceWidth * 0.9,
         },
-      ]}>
+      ]}
+    >
       <TouchableOpacity
         onPress={() => {
           setSuperOpticHeight(0);
@@ -259,9 +263,9 @@ const SuperOptic = (
           position: 'absolute',
           top: 0,
           padding: 20,
-          zIndex: 1001,
+          // zIndex: 1001,
           right: DeviceWidth / 2,
-          transform: [{translateX: 50}],
+          transform: [{ translateX: 50 }],
           opacity: superOpticHeight > 0 ? 1 : 0,
           shadowColor: '#000',
           shadowOffset: {
@@ -272,14 +276,16 @@ const SuperOptic = (
           shadowRadius: 3.84,
 
           elevation: 5,
-        }}>
+        }}
+      >
         <Text
           style={{
             fontSize: 20,
             borderRadius: 150,
             borderWidth: 1,
             padding: 10,
-          }}>
+          }}
+        >
           X
         </Text>
       </TouchableOpacity>
@@ -298,7 +304,7 @@ const SuperOptic = (
       />
     </View>
   ) : (
-    <View style={{height: 10}} />
+    <View style={{ height: 10 }} />
   );
 };
 
@@ -311,7 +317,7 @@ const Sticky = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA,
+  CTA
 ) => {
   const [stickyHeight, setStickyHeight] = useState(height);
   return URL ? (
@@ -321,9 +327,11 @@ const Sticky = (
         // bottom: 0,
         // left: 0,
         // right: 0,
-        height: stickyHeight,
+        // height: stickyHeight,
+        height: 200,
         width: DeviceWidth * 0.9,
-      }}>
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           setStickyHeight(0);
@@ -332,9 +340,9 @@ const Sticky = (
           position: 'absolute',
           top: 0,
           padding: 20,
-          zIndex: 1001,
+          // zIndex: 1001,
           right: DeviceWidth / 2,
-          transform: [{translateX: 50}],
+          transform: [{ translateX: 50 }],
           opacity: stickyHeight > 0 ? 1 : 0,
           shadowColor: '#000',
           shadowOffset: {
@@ -345,14 +353,16 @@ const Sticky = (
           shadowRadius: 3.84,
 
           elevation: 5,
-        }}>
+        }}
+      >
         <Text
           style={{
             fontSize: 20,
             borderRadius: 150,
             borderWidth: 1,
             padding: 10,
-          }}>
+          }}
+        >
           X
         </Text>
       </TouchableOpacity>
@@ -373,7 +383,7 @@ const Sticky = (
       />
     </View>
   ) : (
-    <View style={{height: 10}} />
+    <View style={{ height: 10 }} />
   );
 };
 
@@ -386,15 +396,19 @@ const defaultAd = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA,
+  CTA
 ) => {
   return URL ? (
     <View
       style={[
-        {height: height, width: width},
+        { height: height, width: width },
         //  styles
-      ]}>
-      <TouchableOpacity style={{flex: 1}} onPress={() => Linking.openURL(CTA)}>
+      ]}
+    >
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        onPress={() => Linking.openURL(CTA)}
+      >
         <WebView
           originWhitelist={['*']}
           source={{
@@ -411,7 +425,7 @@ const defaultAd = (
       </TouchableOpacity>
     </View>
   ) : (
-    <View style={{height: 10}} />
+    <View style={{ height: 10 }} />
   );
 };
 
