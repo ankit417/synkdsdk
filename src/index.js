@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   ViewStyle,
-  Modal,
   Dimensions,
   TouchableOpacity,
   StyleSheet,
   Text,
   Linking,
   Image,
+  Animated,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -18,6 +18,80 @@ const DeviceHeight = Dimensions.get('window').height;
 const MAIN_URL =
   'https://insprep.s3.eu-west-1.amazonaws.com/SDK/apptags/adsdk2.html?';
 const MAIN_SRC = 'https://media-cdn.synkd.life/fenix.js';
+
+const Modal = ({ children, visible, minHeight, maxHeight, onClose }) => {
+  const animation = React.useRef(new Animated.Value(0));
+  const [expanded, setExpanded] = React.useState(false);
+
+  React.useEffect(() => {
+    Animated.timing(animation.current, {
+      toValue: expanded ? 1 : 0,
+      duration: 250,
+    }).start();
+  }, [expanded]);
+
+  const animatedContainerStyle = {
+    height: animation.current.interpolate({
+      inputRange: [0, 1],
+      outputRange: [minHeight, maxHeight],
+    }),
+  };
+
+  return (
+    visible && (
+      <Animated.View
+        style={[
+          animatedContainerStyle,
+          {
+            // backgroundColor: 'yellow',
+            overflow: 'hidden',
+          },
+        ]}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 30,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+            }}
+          >
+            {expanded ? (
+              <>
+                <TouchableOpacity
+                  style={SDKstyles.button}
+                  onPress={() => setExpanded(false)}
+                >
+                  <Text style={SDKstyles.buttonText}>-</Text>
+                </TouchableOpacity>
+                <View style={{ width: 5 }} />
+              </>
+            ) : (
+              <TouchableOpacity
+                style={SDKstyles.button}
+                onPress={() => setExpanded(true)}
+              >
+                <Text style={SDKstyles.buttonText}>+</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View>
+            <TouchableOpacity style={SDKstyles.button} onPress={onClose}>
+              <Text style={SDKstyles.buttonText}>x</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {children}
+      </Animated.View>
+    )
+  );
+};
 
 export const SynkdSdk = ({
   sKey,
@@ -52,9 +126,11 @@ export const SynkdSdk = ({
       body: JSON.stringify(body),
     })
       .then((res) => {
+        console.log('res', res);
         return res.json();
       })
       .then((r) => {
+        // console.log("This is test",r?.data)
         setAdData(r?.data);
       })
       .catch((error) => {});
@@ -154,67 +230,16 @@ const interStitial = (
   CTA
 ) => {
   const [modalVisible, setModalVisible] = useState(true);
-  const [interstitialHeight, setInterstitialHeight] = useState(DeviceHeight);
-  const [interstitialWidth, setInterstitialWidth] = useState(DeviceWidth * 0.9);
-  const [imageHeight, setImageHeight] = useState(50);
-  const updateAd = () => {
-    setModalVisible(!modalVisible);
-    setInterstitialHeight(0);
-    setInterstitialWidth(0);
-  };
+  const [visible, setVisible] = React.useState(true);
 
   return URL ? (
-    <View
-      style={{
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        // zIndex: 1000,
-        height: interstitialHeight,
-        width: DeviceWidth,
-      }}
+    <Modal
+      visible={visible}
+      minHeight={200}
+      maxHeight={DeviceHeight}
+      onClose={() => setVisible(false)}
     >
-      <TouchableOpacity
-        onPress={() => {
-          setInterstitialHeight(0);
-        }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          padding: 20,
-          // zIndex: 1001,
-          right: DeviceWidth / 2,
-          transform: [{ translateX: 50 }],
-          opacity: interstitialHeight > 0 ? 1 : 0,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-
-          elevation: 5,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 20,
-            borderRadius: 150,
-            borderWidth: 1,
-            padding: 10,
-          }}
-        >
-          X
-        </Text>
-      </TouchableOpacity>
       <WebView
-        style={{
-          height: '100%',
-          width: '100%',
-        }}
         originWhitelist={['*']}
         source={{
           uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
@@ -227,7 +252,7 @@ const interStitial = (
           Linking.openURL(request.url);
         }}
       />
-    </View>
+    </Modal>
   ) : (
     <View style={{ height: 10 }} />
   );
@@ -244,51 +269,15 @@ const SuperOptic = (
   URL,
   CTA
 ) => {
-  const [superOpticHeight, setSuperOpticHeight] = useState(DeviceHeight);
+  const [visible, setVisible] = React.useState(true);
 
   return URL ? (
-    <View
-      style={[
-        {
-          height: superOpticHeight,
-          width: DeviceWidth * 0.9,
-        },
-      ]}
+    <Modal
+      visible={visible}
+      minHeight={200}
+      maxHeight={DeviceHeight}
+      onClose={() => setVisible(false)}
     >
-      <TouchableOpacity
-        onPress={() => {
-          setSuperOpticHeight(0);
-        }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          padding: 20,
-          // zIndex: 1001,
-          right: DeviceWidth / 2,
-          transform: [{ translateX: 50 }],
-          opacity: superOpticHeight > 0 ? 1 : 0,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-
-          elevation: 5,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 20,
-            borderRadius: 150,
-            borderWidth: 1,
-            padding: 10,
-          }}
-        >
-          X
-        </Text>
-      </TouchableOpacity>
       <WebView
         originWhitelist={['*']}
         source={{
@@ -302,7 +291,7 @@ const SuperOptic = (
           Linking.openURL(request.url);
         }}
       />
-    </View>
+    </Modal>
   ) : (
     <View style={{ height: 10 }} />
   );
@@ -312,63 +301,22 @@ const Sticky = (
   sKey,
   tag,
   mraid = false,
-  height = 50,
+  height = 200,
   width = 300,
   // styles: ViewStyle,
   type,
   URL,
   CTA
 ) => {
-  const [stickyHeight, setStickyHeight] = useState(height);
+  const [visible, setVisible] = React.useState(true);
   return URL ? (
-    <View
-      style={{
-        // position: 'absolute',
-        // bottom: 0,
-        // left: 0,
-        // right: 0,
-        // height: stickyHeight,
-        height: 200,
-        width: DeviceWidth * 0.9,
-      }}
+    <Modal
+      visible={visible}
+      minHeight={200}
+      maxHeight={500}
+      onClose={() => setVisible(false)}
     >
-      <TouchableOpacity
-        onPress={() => {
-          setStickyHeight(0);
-        }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          padding: 20,
-          // zIndex: 1001,
-          right: DeviceWidth / 2,
-          transform: [{ translateX: 50 }],
-          opacity: stickyHeight > 0 ? 1 : 0,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-
-          elevation: 5,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 20,
-            borderRadius: 150,
-            borderWidth: 1,
-            padding: 10,
-          }}
-        >
-          X
-        </Text>
-      </TouchableOpacity>
-
       <WebView
-        // style={SDKstyles.adView}
         originWhitelist={['*']}
         source={{
           uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
@@ -381,7 +329,7 @@ const Sticky = (
           Linking.openURL(request.url);
         }}
       />
-    </View>
+    </Modal>
   ) : (
     <View style={{ height: 10 }} />
   );
@@ -399,31 +347,26 @@ const defaultAd = (
   CTA
 ) => {
   return URL ? (
-    <View
-      style={[
-        { height: height, width: width },
-        //  styles
-      ]}
+    <Modal
+      visible={visible}
+      minHeight={200}
+      maxHeight={500}
+      onClose={() => setVisible(false)}
     >
-      <TouchableOpacity
-        style={{ flex: 1 }}
-        onPress={() => Linking.openURL(CTA)}
-      >
-        <WebView
-          originWhitelist={['*']}
-          source={{
-            uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
-          }}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          startInLoadingState={true}
-          scalesPageToFit={true}
-          onShouldStartLoadWithRequest={(request) => {
-            Linking.openURL(request.url);
-          }}
-        />
-      </TouchableOpacity>
-    </View>
+      <WebView
+        originWhitelist={['*']}
+        source={{
+          uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
+        }}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        startInLoadingState={true}
+        scalesPageToFit={true}
+        onShouldStartLoadWithRequest={(request) => {
+          Linking.openURL(request.url);
+        }}
+      />
+    </Modal>
   ) : (
     <View style={{ height: 10 }} />
   );
@@ -457,5 +400,23 @@ const SDKstyles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  button: {
+    width: 30,
+    height: 30,
+    backgroundColor: '#e1e1e1',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+  },
+  buttonText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    transform: [
+      {
+        translateY: -2,
+      },
+    ],
   },
 });
