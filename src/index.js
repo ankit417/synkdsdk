@@ -9,6 +9,7 @@ import {
   Linking,
   Image,
   Animated,
+  Modal
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -19,7 +20,7 @@ const MAIN_URL =
   'https://insprep.s3.eu-west-1.amazonaws.com/SDK/apptags/adsdk2.html?';
 const MAIN_SRC = 'https://media-cdn.synkd.life/fenix.js';
 
-const Modal = ({ children, visible, minHeight, maxHeight, onClose }) => {
+const AdModal = ({ children, visible, minHeight, maxHeight, onClose }) => {
   const animation = React.useRef(new Animated.Value(0));
   const [expanded, setExpanded] = React.useState(false);
 
@@ -43,7 +44,6 @@ const Modal = ({ children, visible, minHeight, maxHeight, onClose }) => {
         style={[
           animatedContainerStyle,
           {
-            // backgroundColor: 'yellow',
             overflow: 'hidden',
           },
         ]}
@@ -92,6 +92,42 @@ const Modal = ({ children, visible, minHeight, maxHeight, onClose }) => {
     )
   );
 };
+
+
+const FullScreenAd = ({children}) => {
+  const [modalVisible , setModalVisible] = useState(true)
+  return(
+    // <View style={{flex:1, backgroundColor:'red'}}>
+
+    <Modal
+      visible={modalVisible}
+      onRequestClose={()=>{setModalVisible(false)}}
+      style={{flex:1, backgroundColor:"yellow",margin: 20,
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5}}
+      >
+
+      <View style={{flex:1,minHeight:300}}>
+      <View style={{flexDirection:'row',justifyContent:'flex-end'}}>
+            <TouchableOpacity style={SDKstyles.button} onPress={()=>{setModalVisible(false)}}>
+              <Text style={SDKstyles.buttonText}>x</Text>
+            </TouchableOpacity>
+          </View>
+        {children}
+      </View>
+    </Modal>
+  )
+}
 
 export const SynkdSdk = ({
   sKey,
@@ -229,30 +265,33 @@ const interStitial = (
   URL,
   CTA
 ) => {
-  const [modalVisible, setModalVisible] = useState(true);
-  const [visible, setVisible] = React.useState(true);
 
   return URL ? (
-    <Modal
-      visible={visible}
-      minHeight={200}
-      maxHeight={DeviceHeight}
-      onClose={() => setVisible(false)}
+    <FullScreenAd
     >
       <WebView
         originWhitelist={['*']}
         source={{
+          // uri:"https://www.google.com"
           uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
         }}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         startInLoadingState={true}
         scalesPageToFit={true}
-        onShouldStartLoadWithRequest={(request) => {
-          Linking.openURL(request.url);
+        onShouldStartLoadWithRequest={(event) => {
+          const isExternalLink =
+            Platform.OS === 'ios' ? event.navigationType === 'click' : true;
+          if (isExternalLink) {
+            Linking.openURL(event.url);
+            return false;
+          }
+          return true;
         }}
+        mediaPlaybackRequiresUserAction
+        style={{flex:1}}
       />
-    </Modal>
+    </FullScreenAd>
   ) : (
     <View style={{ height: 10 }} />
   );
@@ -272,7 +311,7 @@ const SuperOptic = (
   const [visible, setVisible] = React.useState(true);
 
   return URL ? (
-    <Modal
+    <AdModal
       visible={visible}
       minHeight={200}
       maxHeight={DeviceHeight}
@@ -287,11 +326,18 @@ const SuperOptic = (
         domStorageEnabled={true}
         startInLoadingState={true}
         scalesPageToFit={true}
-        onShouldStartLoadWithRequest={(request) => {
-          Linking.openURL(request.url);
+        onShouldStartLoadWithRequest={(event) => {
+          const isExternalLink =
+            Platform.OS === 'ios' ? event.navigationType === 'click' : true;
+          if (isExternalLink) {
+            Linking.openURL(event.url);
+            return false;
+          }
+          return true;
         }}
+        mediaPlaybackRequiresUserAction
       />
-    </Modal>
+    </AdModal>
   ) : (
     <View style={{ height: 10 }} />
   );
@@ -301,7 +347,7 @@ const Sticky = (
   sKey,
   tag,
   mraid = false,
-  height = 200,
+  height = height,
   width = 300,
   // styles: ViewStyle,
   type,
@@ -310,10 +356,10 @@ const Sticky = (
 ) => {
   const [visible, setVisible] = React.useState(true);
   return URL ? (
-    <Modal
+    <AdModal
       visible={visible}
       minHeight={200}
-      maxHeight={500}
+      maxHeight={height*1.10}
       onClose={() => setVisible(false)}
     >
       <WebView
@@ -325,11 +371,19 @@ const Sticky = (
         domStorageEnabled={true}
         startInLoadingState={true}
         scalesPageToFit={true}
-        onShouldStartLoadWithRequest={(request) => {
-          Linking.openURL(request.url);
+        scrollEnabled={true}
+        onShouldStartLoadWithRequest={(event) => {
+          const isExternalLink =
+            Platform.OS === 'ios' ? event.navigationType === 'click' : true;
+          if (isExternalLink) {
+            Linking.openURL(event.url);
+            return false;
+          }
+          return true;
         }}
+        mediaPlaybackRequiresUserAction
       />
-    </Modal>
+    </AdModal>
   ) : (
     <View style={{ height: 10 }} />
   );
@@ -347,7 +401,7 @@ const defaultAd = (
   CTA
 ) => {
   return URL ? (
-    <Modal
+    <AdModal
       visible={visible}
       minHeight={200}
       maxHeight={500}
@@ -362,11 +416,17 @@ const defaultAd = (
         domStorageEnabled={true}
         startInLoadingState={true}
         scalesPageToFit={true}
-        onShouldStartLoadWithRequest={(request) => {
-          Linking.openURL(request.url);
+        onShouldStartLoadWithRequest={(event) => {
+          const isExternalLink =
+            Platform.OS === 'ios' ? event.navigationType === 'click' : false;
+          if (isExternalLink) {
+            Linking.openURL(event.url);
+            return false;
+          }
+          return true;
         }}
       />
-    </Modal>
+    </AdModal>
   ) : (
     <View style={{ height: 10 }} />
   );
