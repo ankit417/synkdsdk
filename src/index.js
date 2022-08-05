@@ -9,7 +9,7 @@ import {
   Linking,
   Image,
   Animated,
-  Modal
+  Modal,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -28,6 +28,7 @@ const AdModal = ({ children, visible, minHeight, maxHeight, onClose }) => {
     Animated.timing(animation.current, {
       toValue: expanded ? 1 : 0,
       duration: 250,
+      useNativeDriver: false,
     }).start();
   }, [expanded]);
 
@@ -93,41 +94,55 @@ const AdModal = ({ children, visible, minHeight, maxHeight, onClose }) => {
   );
 };
 
-
-const FullScreenAd = ({children}) => {
-  const [modalVisible , setModalVisible] = useState(true)
-  return(
+const FullScreenAd = ({ children, refresh }) => {
+  const [modalVisible, setModalVisible] = useState(true);
+  useEffect(() => {
+    if (!modalVisible) {
+      setModalVisible(true);
+    }
+  }, [refresh]);
+  return (
     // <View style={{flex:1, backgroundColor:'red'}}>
 
     <Modal
       visible={modalVisible}
-      onRequestClose={()=>{setModalVisible(false)}}
-      style={{flex:1, backgroundColor:"yellow",margin: 20,
-      backgroundColor: "white",
-      borderRadius: 20,
-      padding: 35,
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 2
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5}}
-      >
-
-      <View style={{flex:1,minHeight:300}}>
-      <View style={{flexDirection:'row',justifyContent:'flex-end'}}>
-            <TouchableOpacity style={SDKstyles.button} onPress={()=>{setModalVisible(false)}}>
-              <Text style={SDKstyles.buttonText}>x</Text>
-            </TouchableOpacity>
-          </View>
+      onRequestClose={() => {
+        setModalVisible(false);
+      }}
+      style={{
+        flex: 1,
+        backgroundColor: 'yellow',
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+      }}
+    >
+      <View style={{ flex: 1, minHeight: 300 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <TouchableOpacity
+            style={SDKstyles.button}
+            onPress={() => {
+              setModalVisible(false);
+            }}
+          >
+            <Text style={SDKstyles.buttonText}>x</Text>
+          </TouchableOpacity>
+        </View>
         {children}
       </View>
     </Modal>
-  )
-}
+  );
+};
 
 export const SynkdSdk = ({
   sKey,
@@ -137,11 +152,12 @@ export const SynkdSdk = ({
   width = 400,
   // styles,
   type,
+  refresh,
 }) => {
   const [adData, setAdData] = useState(null);
   useEffect(() => {
     getAd();
-  }, []);
+  }, [refresh]);
 
   const getAd = async () => {
     let body = {
@@ -171,7 +187,7 @@ export const SynkdSdk = ({
       })
       .catch((error) => {});
   };
-
+  console.log('refresh synkd', refresh);
   let CTA = adData?.CTA;
   let adURL = adData?.Creative.length > 0 ? adData?.Creative[0].Path : null;
   let adHeight = adData?.Creative.length > 0 ? adData?.Creative[0].Height : 400;
@@ -186,7 +202,8 @@ export const SynkdSdk = ({
     // styles,
     type,
     adURL,
-    CTA
+    CTA,
+    refresh
   );
 };
 
@@ -199,7 +216,8 @@ const getAdType = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA
+  CTA,
+  refresh
 ) => {
   switch (type) {
     case 'superoptic':
@@ -212,7 +230,8 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA
+        CTA,
+        refresh
       );
 
     case 'sticky':
@@ -225,7 +244,8 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA
+        CTA,
+        refresh
       );
     case 'interstitial':
       return interStitial(
@@ -237,7 +257,8 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA
+        CTA,
+        refresh
       );
     default:
       return superoptic(
@@ -249,7 +270,8 @@ const getAdType = (
         // styles,
         type,
         URL,
-        CTA
+        CTA,
+        refresh
       );
   }
 };
@@ -263,12 +285,12 @@ const interStitial = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA
+  CTA,
+  refresh
 ) => {
-
+  console.log('interstitial', refresh);
   return URL ? (
-    <FullScreenAd
-    >
+    <FullScreenAd refresh={refresh}>
       <WebView
         originWhitelist={['*']}
         source={{
@@ -289,7 +311,7 @@ const interStitial = (
           return true;
         }}
         mediaPlaybackRequiresUserAction
-        style={{flex:1}}
+        style={{ flex: 1 }}
       />
     </FullScreenAd>
   ) : (
@@ -306,9 +328,15 @@ const SuperOptic = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA
+  CTA,
+  refresh
 ) => {
   const [visible, setVisible] = React.useState(true);
+  useEffect(() => {
+    if (!visible) {
+      setVisible(true);
+    }
+  }, [refresh]);
 
   return URL ? (
     <AdModal
@@ -352,14 +380,20 @@ const Sticky = (
   // styles: ViewStyle,
   type,
   URL,
-  CTA
+  CTA,
+  refresh
 ) => {
   const [visible, setVisible] = React.useState(true);
+  useEffect(() => {
+    if (!visible) {
+      setVisible(true);
+    }
+  }, [refresh]);
   return URL ? (
     <AdModal
       visible={visible}
       minHeight={200}
-      maxHeight={height*1.10}
+      maxHeight={height * 1.1}
       onClose={() => setVisible(false)}
     >
       <WebView
