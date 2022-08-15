@@ -1,6 +1,6 @@
 {
   "name": "react-native-synkd-sdk",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "synkd sdk",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
