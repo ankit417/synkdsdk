@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  ViewStyle,
   Dimensions,
   TouchableOpacity,
   StyleSheet,
-  Text,
   Linking,
   Image,
   Animated,
   Modal,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+import EXPAND from './assets/expand.png';
+import MINIMIZE from './assets/minimize.png';
+import CLOSE from './assets/close.png';
 
-const DeviceWidth = Dimensions.get('window').width;
 const DeviceHeight = Dimensions.get('window').height;
 
 const MAIN_URL =
@@ -53,7 +53,6 @@ const AdModal = ({ children, visible, minHeight, maxHeight, onClose }) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingHorizontal: 30,
           }}
         >
           <View
@@ -64,26 +63,29 @@ const AdModal = ({ children, visible, minHeight, maxHeight, onClose }) => {
             {expanded ? (
               <>
                 <TouchableOpacity
-                  style={SDKstyles.button}
+                  style={[SDKstyles.button, { zIndex: 3 }]}
                   onPress={() => setExpanded(false)}
                 >
-                  <Text style={SDKstyles.buttonText}>-</Text>
+                  <Image source={MINIMIZE} style={{ height: 24, width: 24 }} />
                 </TouchableOpacity>
                 <View style={{ width: 5 }} />
               </>
             ) : (
               <TouchableOpacity
-                style={SDKstyles.button}
+                style={[SDKstyles.button, { zIndex: 3 }]}
                 onPress={() => setExpanded(true)}
               >
-                <Text style={SDKstyles.buttonText}>+</Text>
+                <Image source={EXPAND} style={{ height: 24, width: 24 }} />
               </TouchableOpacity>
             )}
           </View>
 
           <View>
-            <TouchableOpacity style={SDKstyles.button} onPress={onClose}>
-              <Text style={SDKstyles.buttonText}>x</Text>
+            <TouchableOpacity
+              style={[SDKstyles.button, { zIndex: 3 }]}
+              onPress={onClose}
+            >
+              <Image source={CLOSE} style={{ height: 24, width: 24 }} />
             </TouchableOpacity>
           </View>
         </View>
@@ -96,14 +98,12 @@ const AdModal = ({ children, visible, minHeight, maxHeight, onClose }) => {
 
 const FullScreenAd = ({ children, refresh }) => {
   const [modalVisible, setModalVisible] = useState(true);
-  useEffect(() => {
-    if (!modalVisible) {
-      setModalVisible(true);
-    }
-  }, [refresh]);
-  return (
-    // <View style={{flex:1, backgroundColor:'red'}}>
 
+  useEffect(() => {
+    setModalVisible(true);
+  }, [refresh]);
+
+  return (
     <Modal
       visible={modalVisible}
       onRequestClose={() => {
@@ -130,12 +130,12 @@ const FullScreenAd = ({ children, refresh }) => {
       <View style={{ flex: 1, minHeight: 300 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
           <TouchableOpacity
-            style={SDKstyles.button}
+            style={[SDKstyles.button, SDKstyles.closeButton]}
             onPress={() => {
               setModalVisible(false);
             }}
           >
-            <Text style={SDKstyles.buttonText}>x</Text>
+            <Image source={CLOSE} style={{ height: 24, width: 24 }} />
           </TouchableOpacity>
         </View>
         {children}
@@ -150,14 +150,13 @@ export const SynkdSdk = ({
   mraid = false,
   height = 400,
   width = 400,
-  // styles,
   type,
   refresh,
 }) => {
   const [adData, setAdData] = useState(null);
   useEffect(() => {
     getAd();
-  }, [refresh]);
+  }, []);
 
   const getAd = async () => {
     let body = {
@@ -182,12 +181,11 @@ export const SynkdSdk = ({
         return res.json();
       })
       .then((r) => {
-        // console.log("This is test",r?.data)
         setAdData(r?.data);
       })
       .catch((error) => {});
   };
-  console.log('refresh synkd', refresh);
+
   let CTA = adData?.CTA;
   let adURL = adData?.Creative.length > 0 ? adData?.Creative[0].Path : null;
   let adHeight = adData?.Creative.length > 0 ? adData?.Creative[0].Height : 400;
@@ -199,7 +197,6 @@ export const SynkdSdk = ({
     (mraid = false),
     (height = parseInt(adHeight)),
     (width = parseInt(adwidth)),
-    // styles,
     type,
     adURL,
     CTA,
@@ -213,7 +210,6 @@ const getAdType = (
   mraid = false,
   height = 400,
   width = 400,
-  // styles: ViewStyle,
   type,
   URL,
   CTA,
@@ -227,7 +223,6 @@ const getAdType = (
         mraid,
         height,
         width,
-        // styles,
         type,
         URL,
         CTA,
@@ -235,18 +230,7 @@ const getAdType = (
       );
 
     case 'sticky':
-      return Sticky(
-        sKey,
-        tag,
-        mraid,
-        height,
-        width,
-        // styles,
-        type,
-        URL,
-        CTA,
-        refresh
-      );
+      return Sticky(sKey, tag, mraid, height, width, type, URL, CTA, refresh);
     case 'interstitial':
       return interStitial(
         sKey,
@@ -254,7 +238,6 @@ const getAdType = (
         mraid,
         height,
         width,
-        // styles,
         type,
         URL,
         CTA,
@@ -267,7 +250,6 @@ const getAdType = (
         (mraid = false),
         height,
         width,
-        // styles,
         type,
         URL,
         CTA,
@@ -282,37 +264,46 @@ const interStitial = (
   mraid = false,
   height = 400,
   width = 400,
-  // styles: ViewStyle,
   type,
   URL,
   CTA,
   refresh
 ) => {
-  console.log('interstitial', refresh);
   return URL ? (
     <FullScreenAd refresh={refresh}>
-      <WebView
-        originWhitelist={['*']}
-        source={{
-          // uri:"https://www.google.com"
-          uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
+      <View
+        style={{
+          flex: 1,
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 2,
         }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={true}
-        scalesPageToFit={true}
-        onShouldStartLoadWithRequest={(event) => {
-          const isExternalLink =
-            Platform.OS === 'ios' ? event.navigationType === 'click' : true;
-          if (isExternalLink) {
-            Linking.openURL(event.url);
-            return false;
-          }
-          return true;
-        }}
-        mediaPlaybackRequiresUserAction
-        style={{ flex: 1 }}
-      />
+      >
+        <WebView
+          originWhitelist={['*']}
+          source={{
+            uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
+          }}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          startInLoadingState={true}
+          scalesPageToFit={true}
+          onShouldStartLoadWithRequest={(event) => {
+            const isExternalLink =
+              Platform.OS === 'ios' ? event.navigationType === 'click' : true;
+            if (isExternalLink) {
+              Linking.openURL(event.url);
+              return false;
+            }
+            return true;
+          }}
+          mediaPlaybackRequiresUserAction
+          style={{ flex: 1 }}
+        />
+      </View>
     </FullScreenAd>
   ) : (
     <View style={{ height: 10 }} />
@@ -325,7 +316,6 @@ const SuperOptic = (
   mraid = false,
   height,
   width,
-  // styles: ViewStyle,
   type,
   URL,
   CTA,
@@ -333,9 +323,7 @@ const SuperOptic = (
 ) => {
   const [visible, setVisible] = React.useState(true);
   useEffect(() => {
-    if (!visible) {
-      setVisible(true);
-    }
+    setVisible(true);
   }, [refresh]);
 
   return URL ? (
@@ -345,26 +333,28 @@ const SuperOptic = (
       maxHeight={DeviceHeight}
       onClose={() => setVisible(false)}
     >
-      <WebView
-        originWhitelist={['*']}
-        source={{
-          uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
-        }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={true}
-        scalesPageToFit={true}
-        onShouldStartLoadWithRequest={(event) => {
-          const isExternalLink =
-            Platform.OS === 'ios' ? event.navigationType === 'click' : true;
-          if (isExternalLink) {
-            Linking.openURL(event.url);
-            return false;
-          }
-          return true;
-        }}
-        mediaPlaybackRequiresUserAction
-      />
+      <View style={SDKstyles.adModalWebWrapper}>
+        <WebView
+          originWhitelist={['*']}
+          source={{
+            uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
+          }}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          startInLoadingState={true}
+          scalesPageToFit={true}
+          onShouldStartLoadWithRequest={(event) => {
+            const isExternalLink =
+              Platform.OS === 'ios' ? event.navigationType === 'click' : true;
+            if (isExternalLink) {
+              Linking.openURL(event.url);
+              return false;
+            }
+            return true;
+          }}
+          mediaPlaybackRequiresUserAction
+        />
+      </View>
     </AdModal>
   ) : (
     <View style={{ height: 10 }} />
@@ -377,7 +367,6 @@ const Sticky = (
   mraid = false,
   height = height,
   width = 300,
-  // styles: ViewStyle,
   type,
   URL,
   CTA,
@@ -385,9 +374,7 @@ const Sticky = (
 ) => {
   const [visible, setVisible] = React.useState(true);
   useEffect(() => {
-    if (!visible) {
-      setVisible(true);
-    }
+    setVisible(true);
   }, [refresh]);
   return URL ? (
     <AdModal
@@ -396,74 +383,41 @@ const Sticky = (
       maxHeight={height * 1.1}
       onClose={() => setVisible(false)}
     >
-      <WebView
-        originWhitelist={['*']}
-        source={{
-          uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
-        }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={true}
-        scalesPageToFit={true}
-        scrollEnabled={true}
-        onShouldStartLoadWithRequest={(event) => {
-          const isExternalLink =
-            Platform.OS === 'ios' ? event.navigationType === 'click' : true;
-          if (isExternalLink) {
-            Linking.openURL(event.url);
-            return false;
-          }
-          return true;
-        }}
-        mediaPlaybackRequiresUserAction
-      />
+      <View style={SDKstyles.adModalWebWrapper}>
+        <WebView
+          originWhitelist={['*']}
+          source={{
+            uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
+          }}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          startInLoadingState={true}
+          scalesPageToFit={true}
+          scrollEnabled={true}
+          onShouldStartLoadWithRequest={(event) => {
+            const isExternalLink =
+              Platform.OS === 'ios' ? event.navigationType === 'click' : true;
+            if (isExternalLink) {
+              Linking.openURL(event.url);
+              return false;
+            }
+            return true;
+          }}
+          mediaPlaybackRequiresUserAction
+        />
+      </View>
     </AdModal>
   ) : (
     <View style={{ height: 10 }} />
   );
 };
 
-const defaultAd = (
-  sKey,
-  tag,
-  mraid = false,
-  height = 400,
-  width = 400,
-  // styles: ViewStyle,
-  type,
-  URL,
-  CTA
-) => {
-  return URL ? (
-    <AdModal
-      visible={visible}
-      minHeight={200}
-      maxHeight={500}
-      onClose={() => setVisible(false)}
-    >
-      <WebView
-        originWhitelist={['*']}
-        source={{
-          uri: `${MAIN_URL}src=${MAIN_SRC}&tag=${tag}&key=${sKey}&mraid=${mraid}`,
-        }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={true}
-        scalesPageToFit={true}
-        onShouldStartLoadWithRequest={(event) => {
-          const isExternalLink =
-            Platform.OS === 'ios' ? event.navigationType === 'click' : false;
-          if (isExternalLink) {
-            Linking.openURL(event.url);
-            return false;
-          }
-          return true;
-        }}
-      />
-    </AdModal>
-  ) : (
-    <View style={{ height: 10 }} />
-  );
+export const useRefresh = () => {
+  const [refresh, setRefresh] = useState(false);
+  const toogleRefresh = () => {
+    setRefresh((prev) => !prev);
+  };
+  return { refresh, toogleRefresh };
 };
 
 const SDKstyles = StyleSheet.create({
@@ -482,10 +436,20 @@ const SDKstyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  adModalWebWrapper: {
+    flex: 1,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 2,
+  },
   button: {
     borderRadius: 5,
     padding: 10,
     elevation: 2,
+    position: 'absolute',
   },
   buttonClose: {
     backgroundColor: '#d3d3d3',
@@ -498,11 +462,16 @@ const SDKstyles = StyleSheet.create({
   button: {
     width: 30,
     height: 30,
-    backgroundColor: '#e1e1e1',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 15,
+  },
+  closeButton: {
+    zIndex: 3,
+    top: 8,
+    right: 8,
+    backgroundColor: '#7F7F7F',
   },
   buttonText: {
     fontSize: 30,
