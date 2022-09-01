@@ -8,6 +8,7 @@ import {
   Image,
   Animated,
   Modal,
+  Platform
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import EXPAND from './assets/expand.png';
@@ -15,6 +16,8 @@ import MINIMIZE from './assets/minimize.png';
 import CLOSE from './assets/close.png';
 
 const DeviceHeight = Dimensions.get('window').height;
+
+const platform = Platform.OS === "ios"?true:false;
 
 const MAIN_URL =
   'https://insprep.s3.eu-west-1.amazonaws.com/SDK/apptags/adsdk2.html?';
@@ -53,6 +56,7 @@ const AdModal = ({ children, visible, minHeight, maxHeight, onClose }) => {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
+            zIndex: 100
           }}
         >
           <View
@@ -128,7 +132,7 @@ const FullScreenAd = ({ children, refresh }) => {
       }}
     >
       <View style={{ flex: 1, minHeight: 300 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+        <View style={[{ flexDirection: 'row', justifyContent: 'flex-end' },platform && SDKstyles.interStitialModalStyle]}>
           <TouchableOpacity
             style={[SDKstyles.button, SDKstyles.closeButton]}
             onPress={() => {
@@ -275,7 +279,7 @@ const interStitial = (
         style={{
           flex: 1,
           position: 'absolute',
-          top: 0,
+          top: platform?60:0,
           bottom: 0,
           left: 0,
           right: 0,
@@ -482,4 +486,7 @@ const SDKstyles = StyleSheet.create({
       },
     ],
   },
+  interStitialModalStyle:{
+    position: 'absolute', top: 60, right: 0, zIndex: 100
+  }
 });
